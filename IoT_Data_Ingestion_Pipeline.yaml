@@ -1,0 +1,72 @@
+{
+    "name": "IoT_Data_Ingestion_Pipeline",
+    "activities": [
+        {
+            "name": "IoT_Hub_Source",
+            "type": "IoTHubSource",
+            "typeProperties": {
+                "iotHubName": {
+                    "value": "{IoTHubName}",
+                    "type": "Expression"
+                },
+                "consumerGroupName": {
+                    "value": "$Default",
+                    "type": "Expression"
+                },
+                "partitionKey": {
+                    "value": "$EventEnqueuedUtcTime",
+                    "type": "Expression"
+                }
+            },
+            "inputs": [],
+            "outputs": [
+                {
+                    "name": "IoT_Data"
+                }
+            ]
+        },
+        {
+            "name": "Data_Transformation",
+            "type": "DataFlow",
+            "dependsOn": [
+                {
+                    "activity": "IoT_Hub_Source",
+                    "activityOutput": [
+                        "IoT_Data"
+                    ]
+                }
+            ],
+            "typeProperties": {
+                "source": {
+                    "type": "TabularSource",
+                    "storeSettings": {
+                        "type": "IoTHubSourceSettings",
+                        "source": {
+                            "activity": "IoT_Hub_Source",
+                            "outputName": "IoT_Data"
+                        }
+                    }
+                },
+                "sinks": [
+                    {
+                        "type": "TabularSink",
+                        "storeSettings": {
+                            "type": "AzureDataLakeStoreSettings",
+                            "filePath": "{DataLakeFilePath}"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "start": "2022-01-01T00:00:00Z",
+    "end": "2022-12-31T23:59:59Z",
+    "isPaused": false,
+    "hubName": "{DataFactoryName}",
+    "pipelineMode": "Standard",
+    "annotations": []
+}
+
+# Here is a sample pipeline in YAML format that performs the data ingestion and transformation:
+# This pipeline extracts data from IoT Hub, performs transformations using a data flow, and loads the transformed data into Azure Data Lake Storage. 
+#The specific transformations to be performed will depend on the data and business requirements.
